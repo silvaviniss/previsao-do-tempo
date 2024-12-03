@@ -1,8 +1,6 @@
 import './WeatherInfo5Days.css';
 
 function WeatherInfo5Days({ weather5Days }) {
-    console.log(weather5Days);
-
     let dailyForecast = {};
 
     for (let forecast of weather5Days.list) {

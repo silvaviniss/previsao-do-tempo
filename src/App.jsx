@@ -1,28 +1,67 @@
 import './App.css';
-import { useRef, useState } from 'react';
 import axios from 'axios';
+import { useRef, useState, useEffect } from 'react';
 import  WeatherInfo from './components/WeatherInfo/WeatherInfo';
 import  WeatherInfo5Days from './components/WeatherInfo5Days/WeatherInfo5Days';
-
 
 function App() {
 	const inputRef = useRef();
 	const [weather, setWeather] = useState();
-	const [weather5Days, setWeather5Days] = useState();
+	const KEY = import.meta.env.VITE_API_KEY;
+	const URL = import.meta.env.VITE_API_URL;
+	const URL_5DAYS = import.meta.env.VITE_API_URL_5DAYS;
 
+
+	const [weather5Days, setWeather5Days] = useState();
+	const [userLocation, setUserLocation] = useState(null);
+	
+	useEffect(() => {
+		searchCityDefault();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[]); 
+
+	function getLocation() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					const { latitude, longitude } = position.coords;
+					setUserLocation({ latitude, longitude });
+					searchCityDefault();
+				}, (error) => {
+					console.error("Erro ao obter localização", error);
+				}
+			);
+		} else {
+			console.error("A geolocalização não é suportada por este navegador");
+		}
+	}
+
+	async function searchCityDefault() {
+		if (userLocation) {
+			const url = `${URL}lat=${userLocation.latitude}&lon=${userLocation.longitude}&appid=${KEY}&lang=pt_br&units=metric`;
+			const url5Days = `${URL_5DAYS}lat=${userLocation.latitude}&lon=${userLocation.longitude}&appid=${KEY}&lang=pt_br&units=metric`;
+
+			const dataWeather = await axios.get(url);
+			const dataForecast = await axios.get(url5Days);
+
+			setWeather(dataWeather.data);
+			setWeather5Days(dataForecast.data);
+		} else {
+			getLocation();
+		}
+	};
 
 	async function searchCity() {
 		const city = inputRef.current.value;
-		const key = "8d8c08c7689b531c4b06131c942a1ab8";
-		const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&lang=pt_br&units=metric`;
-		const url5Days = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${key}&lang=pt_br&units=metric`;
+		const url = `${URL}q=${city}&appid=${KEY}&lang=pt_br&units=metric`;
+		const url5Days = `${URL_5DAYS}q=${city}&appid=${KEY}&lang=pt_br&units=metric`;
 
 		const dataWeather = await axios.get(url);
 		const dataForecast = await axios.get(url5Days);
 
 		setWeather(dataWeather.data);
 		setWeather5Days(dataForecast.data);
-	}
+	};
 
   	return (
 		<div className='container'>
@@ -32,7 +71,6 @@ function App() {
 
 			{ weather && <WeatherInfo weather={weather}/> }
 			{ weather5Days && <WeatherInfo5Days weather5Days={weather5Days}/> }
-
 		</div>
   	);
 }
