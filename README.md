@@ -15,7 +15,7 @@ Aplicativo de previsão do tempo que exibe informações climáticas atualizadas
 * JavaScript
 
 * [Weather API](https://openweathermap.org/api) - API grátis utilizada no projeto.
-* [Documentação](https://openweathermap.org/api/one-call-3) - Detalhes e documentação.
+* [Documentação](https://openweathermap.org/api/one-call-3) - Detalhes e documentação API.
 
 ## 📌 Versão
 
